@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Empório dos Brindes - Natal Tradicional</title>
+
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+
+  <a-scene
+    mindar-image="imageTargetSrc: ./assets/targets_natal_tradicional.mind; autoStart: true; uiScanning: true;"
+    color-space="sRGB"
+    renderer="colorManagement: true, physicallyCorrectLights: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false">
+
+    <a-assets>
+      <video
+        id="santaVideo"
+        src="./assets/Papai_Noel_teste_transparente_01.webm"
+        preload="auto"
+        muted
+        playsinline
+        webkit-playsinline>
+      </video>
+    </a-assets>
+
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false">
+    </a-camera>
+
+    <a-entity mindar-image-target="targetIndex: 0">
+
+      <a-video
+        src="#santaVideo"
+        width="0.48"
+        height="0.36"
+        position="-0.24 0 0.01"
+        material="shader: flat; transparent: true; alphaTest: 0.01">
+      </a-video>
+
+    </a-entity>
+
+  </a-scene>
+
+  <script>
+    const video = document.querySelector("#santaVideo");
+    const target = document.querySelector(
+      "[mindar-image-target]"
+    );
+
+    target.addEventListener("targetFound", () => {
+      video.currentTime = 0;
+      video.play().catch(error => {
+        console.log("Erro ao iniciar vídeo:", error);
+      });
+    });
+
+    target.addEventListener("targetLost", () => {
+      video.pause();
+      video.currentTime = 0;
+    });
+  </script>
+
+</body>
+</html>
