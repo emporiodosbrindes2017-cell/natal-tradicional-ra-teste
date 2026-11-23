@@ -47,11 +47,13 @@
 
     <a-entity mindar-image-target="targetIndex: 0">
 
-      <a-video
+     <a-video
+  id="santaOverlay"
   src="#santaVideo"
   width="1.44"
   height="0.81"
-  position="-0.05 0 0.01"
+  position="0.00 0 0.01"
+  visible="false"
   material="shader: flat; transparent: true; alphaTest: 0.01">
 </a-video>
 
@@ -59,24 +61,50 @@
 
   </a-scene>
 
-  <script>
-    const video = document.querySelector("#santaVideo");
-    const target = document.querySelector(
-      "[mindar-image-target]"
-    );
+ <script>
+  const video = document.querySelector("#santaVideo");
+  const overlay = document.querySelector("#santaOverlay");
 
-    target.addEventListener("targetFound", () => {
-      video.currentTime = 0;
-      video.play().catch(error => {
-        console.log("Erro ao iniciar vídeo:", error);
+  const target = document.querySelector(
+    "[mindar-image-target]"
+  );
+
+  let targetVisible = false;
+
+  video.addEventListener("playing", () => {
+    if (!targetVisible) return;
+
+    if (video.requestVideoFrameCallback) {
+      video.requestVideoFrameCallback(() => {
+        if (targetVisible) {
+          overlay.setAttribute("visible", true);
+        }
       });
-    });
+    } else {
+      overlay.setAttribute("visible", true);
+    }
+  });
 
-    target.addEventListener("targetLost", () => {
-      video.pause();
-      video.currentTime = 0;
+  target.addEventListener("targetFound", () => {
+    targetVisible = true;
+    overlay.setAttribute("visible", false);
+
+    video.currentTime = 0;
+
+    video.play().catch(error => {
+      console.log("Erro ao iniciar vídeo:", error);
     });
-  </script>
+  });
+
+  target.addEventListener("targetLost", () => {
+    targetVisible = false;
+
+    overlay.setAttribute("visible", false);
+
+    video.pause();
+    video.currentTime = 0;
+  });
+</script>
 
 </body>
 </html>
